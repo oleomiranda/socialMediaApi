@@ -14,7 +14,8 @@ const postSchema = new Schema({
 		default: []
 	},
 	author: {
-		type: Schema.types.ObjectId,
-		ref: 'users'
+		type: Schema.Types.ObjectId
 	}
 })
+
+module.exports = mongoose.model("post", postSchema)

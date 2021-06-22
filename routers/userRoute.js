@@ -1,10 +1,10 @@
-const routes = require("express").Router()
+const routers = require("express").Router()
 const user = require("../models/users")
 const bcrypt = require("bcryptjs")
 const createJwt = require("../controllers/createJwt")
 
 
-routes.post("/signup", async (req, res) => {
+routers.post("/signup", async (req, res) => {
 	const { username, email, password } = req.body
 	errors = 0
 	if (username == undefined || username == null || !username) { errors++ }
@@ -17,12 +17,12 @@ routes.post("/signup", async (req, res) => {
 
 	user.findOne({ $or: [{ username: username }, { email: email }] }).then(async (User) => {
 		if (User) {
-			let erros = { status: [] }
+			let errors = { status: [] }
 			if (User.username === username) {
-				erros.status.push("Username já registrado")
+				errors.status.push("Username já registrado")
 			}
 			if (User.email === email) {
-				erros.status.push("Email já registrado")
+				errors.status.push("Email já registrado")
 			}
 			return res.status(400).json(erros)
 
@@ -46,16 +46,15 @@ routes.post("/signup", async (req, res) => {
 	})
 })
 
-routes.post("/login", (req, res) => {
+routers.post("/login", (req, res) => {
 	const { username, password } = req.body
 
 	user.findOne({ username: username }).then((User) => {
 		if (User) {
-			bcrypt.compare(password, User.password, (err, User) => {
+			bcrypt.compare(password, User.password, async (err, user) => {
 				if (User) {
-					const token = createJwt(User._id)
-
-					const maxAge = 2 * 24 * 60 * 60
+					const token = await createJwt(User._id)
+					const maxAge = 30 * 24 * 60 * 60 * 1000
 					res.cookie('jwt', token, { maxAge: maxAge, httpOnly: true, secure: true })
 					res.status(200).json({ 'status': 'Logado com sucesso' })
 				} else {
@@ -70,4 +69,4 @@ routes.post("/login", (req, res) => {
 
 
 
-module.exports = routes
+module.exports = routers

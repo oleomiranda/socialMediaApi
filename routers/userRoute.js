@@ -24,7 +24,7 @@ routers.post("/signup", async (req, res) => {
 			if (User.email === email) {
 				errors.status.push("Email já registrado")
 			}
-			return res.status(400).json(erros)
+			return res.status(400).json(errors)
 
 		} else {
 
@@ -51,9 +51,9 @@ routers.post("/login", (req, res) => {
 
 	user.findOne({ username: username }).then((User) => {
 		if (User) {
-			bcrypt.compare(password, User.password, async (err, user) => {
-				if (User) {
-					const token = await createJwt(User._id)
+			bcrypt.compare(password, User.password, async (err, success) => {
+				if (success) {
+					const token = createJwt(User._id)
 					const maxAge = 30 * 24 * 60 * 60 * 1000
 					res.cookie('jwt', token, { maxAge: maxAge, httpOnly: true, secure: true })
 					res.status(200).json({ 'status': 'Logado com sucesso' })

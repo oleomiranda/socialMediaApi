@@ -2,6 +2,7 @@ const routers = require("express").Router()
 const user = require("../models/users")
 const bcrypt = require("bcryptjs")
 const createJwt = require("../controllers/createJwt")
+const checkUserId = require("../controllers/checkUserId")
 
 
 routers.post("/signup", async (req, res) => {
@@ -66,6 +67,77 @@ routers.post("/login", (req, res) => {
 		}
 	})
 })
+
+
+routers.post("/:currentUserId/follow", async (req, res) => {
+	const {currentUserId} = req.params
+	const {targetId} = req.body
+	if(currentUserId == targetId){
+		return res.status(401).json({'status': 'targetId e currentUserId devem ser diferentes'})
+	}
+
+	const isSameId = checkUserId(currentUserId, req.cookies.jwt)
+	if(isSameId){
+		//CRIAR REQUEST DO BANCO DE DADOS 
+		targetUser = await user.findById(req.body.targetId)
+		currentUser = await user.findById(req.params.currentUserId)	
+	
+		if(currentUser.following.includes(targetUser._id)){
+			return res.status(401).json({'status':'Você já segue este usuario'})
+		}
+
+		try{
+			await user.bulkWrite([{updateOne:{filter:{_id:currentUserId},update:{$push:{following: targetId}}}}])//add target no array "following" do usuario
+			await user.bulkWrite([{updateOne:{filter:{_id:targetId},update:{$push:{followers: currentUserId}}}}])//add id do usuario no array "followers" do targetId
+			
+			return res.status(200).json({'status': 'Você seguiu este usuario'})
+		}catch (err){
+			return res.status(500).json({'status': 'Houve um erro	'})
+		}
+
+	}
+
+})
+
+
+routers.post("/:currentUserId/unfollow", async (req, res) => {
+	const {currentUserId} = req.params
+	const {targetId} = req.body
+	if(currentUserId == targetId){
+		return res.status(401).json({'status': 'TargetId e currentUserId devem ser diferentes'})
+	}	
+
+	const isSameId = checkUserId(currentUserId, req.cookies.jwt)
+	if(isSameId){
+		try{
+			targetUser = await user.findById(req.body.targetId)
+			currentUser = await user.findById(req.params.currentUserId)		
+
+		if(!currentUser.following.includes(targetUser._id)){
+			return res.status(401).json({'status':'Você não segue este usuario'})
+		}
+	}catch (err){
+		return res.status(500).json({'status': 'Houve um erro ao tentar completar esta ação'})
+	}
+
+		try {
+			
+			await user.bulkWrite([{updateOne:{filter:{_id:currentUserId},update:{$pull:{following:targetId}}}}])//remove target no array "following" do usuario
+			await user.bulkWrite([{updateOne:{filter:{_id:targetId},update:{$pull:{followers:currentUserId}}}}])//remove target no array "following" do usuario
+			return res.status(200).json({'status':'Você deixou de seguir este usuario'})
+
+		} catch (err) {
+			return res.status(500).json({'status': err})
+		}
+
+
+	}
+
+
+})
+
+
+
 
 
 

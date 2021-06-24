@@ -1,7 +1,7 @@
 const routers = require("express").Router()
 const jwt = require("jsonwebtoken")
 const post = require("../models/posts")
-const checkUserId = require("../controllers/checkUserId")
+const checkUserId = require("../helper/checkUserId")
 
 routers.post("/create", (req, res) => {
 	const { content, img, author } = req.body
@@ -44,5 +44,48 @@ routers.post("/create", (req, res) => {
 		res.status(500).json({ 'status': 'Houve um erro ao tentar criar o post' })
 	}
 })
+
+routers.delete("/:postId/delete", (req, res) => {
+	const {author} = req.body
+	const {postId} = req.params
+	const token = req.cookies.jwt
+
+	if(token){ //Verifica se existe o Cookie (se o usuario esta logado)
+		const sameId = checkUserId(author, token)
+		if(sameId){ //Verifica se o id no cookie é o mesmo que foi passado no body
+			try {
+				post.findById(req.params.postId, (err, Post) => {
+					if(Post){ //Verifica se o post existe
+						if(Post.author == author){ //Verifica se o id passado no body é o id do autor do post
+							Post.remove((err, success) => {
+								if(success){
+									return res.status(200).json({'status': 'Post deletado com sucesso'})
+								}else{
+									return res.status(500).json({'status':'Não foi possivel deletar esse post'})
+								}
+							})
+					}else{
+						return res.status(401).json({'status':'Você não tem permissão para deletar este post'})
+					}
+					}else{
+						return res.status(500).json({'status':'Não foi possivel encontrar o post'})
+					}
+				})
+			} catch (err) {
+				return res.status(500).json({'status': 'Houve um erro'})
+			}
+		}else{
+			return res.status(401).json({'status':'Você não tem permissão para deletar este post'})
+		}
+
+	}else{
+		return res.status(401).json({'status':'Faça login antes de tentar executar esta ação'})
+	}
+	
+
+
+})
+
+
 
 module.exports = routers

@@ -1,8 +1,8 @@
 const routers = require("express").Router()
 const user = require("../models/users")
 const bcrypt = require("bcryptjs")
-const createJwt = require("../controllers/createJwt")
-const checkUserId = require("../controllers/checkUserId")
+const createJwt = require("../helper/createJwt")
+const checkUserId = require("../helper/checkUserId")
 
 
 routers.post("/signup", async (req, res) => {

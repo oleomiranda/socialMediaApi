@@ -13,7 +13,7 @@ module.exports = {
 		}
 
 		if (token) {
-			const isSameId = checkUserId(currentUserId, req.cookies.jwt)
+			const isSameId = checkUserId(currentUserId, token)
 			if (isSameId) {
 				//CRIAR REQUEST DO BANCO DE DADOS 
 				targetUser = await user.findById(req.body.targetId)
@@ -33,8 +33,8 @@ module.exports = {
 				}
 
 			}
-		}else{
-			return res.status(401).json({'status':'Você precisa estar logado'})
+		} else {
+			return res.status(401).json({ 'status': 'Você precisa estar logado' })
 		}
 
 	},
@@ -50,7 +50,7 @@ module.exports = {
 
 
 		if (token) {
-			const isSameId = checkUserId(currentUserId, req.cookies.jwt)
+			const isSameId = checkUserId(currentUserId, token)
 			if (isSameId) {
 				try {
 					targetUser = await user.findById(req.body.targetId)
@@ -72,7 +72,7 @@ module.exports = {
 				} catch (err) {
 					return res.status(500).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 				}
-			}else{
+			} else {
 				return res.status(400).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 			}
 		} else {
@@ -87,7 +87,7 @@ module.exports = {
 		const token = req.cookies.jwt
 
 		if (token) {
-			isSameId = checkUserId(currentUserId, req.cookies.jwt)
+			isSameId = checkUserId(currentUserId, token)
 			if (isSameId) {
 				try {
 					user.findById(currentUserId, (err, User) => {
@@ -106,6 +106,59 @@ module.exports = {
 			}
 		} else {
 			return res.status(400).json({ 'status': 'Você precisa estar logado' })
+		}
+
+	},
+	profileInfo: (req, res) => {
+		const token = req.cookies.jwt
+		const { userId } = req.params
+
+		if (token) {
+			try {
+				user.findById(userId, (err, User) => {
+					if (User) {
+						const { name, username, followers, following } = User
+						followersCount = followers.length
+						followingCount = following.length
+						return res.json({ 'user': { username, name, 'followers': followersCount, 'following': followingCount } })
+
+					} else {
+						return res.status(404).json({ 'status': 'Usuario não encontrado' })
+					}
+
+				})
+
+			} catch (err) {
+				return res.json({ 'status': 'Houve um erro ao tentar completar esta ação' })
+			}
+		} else {
+			return res.status(401).json({ 'status': 'Você precisa estar logado' })
+		}
+
+	},
+	deleteProfile: (req, res) => {
+		const token = req.cookies.jwt
+		const { currentUserId } = req.params
+
+		if (token) {
+			isSameId = checkUserId(currentUserId, token)
+			if (isSameId) {
+				try {
+					user.findById(req.params.currentUserId, (err, User) => {
+
+						User.remove()
+						res.cookie('jwt', '', { maxAge: 10 })
+						res.status(200).json({ 'status': 'Sua conta foi deletada' })
+					})
+				} catch (err) {
+					return res.status(500).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
+				}
+
+			} else {
+				return res.status(401).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
+			}
+		} else {
+			return res.status(401).json({ 'status': 'Você precisa estar logado' })
 		}
 
 	}

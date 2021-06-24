@@ -23,9 +23,9 @@ routers.post("/create", (req, res) => {
 	try {
 		const token = req.cookies.jwt
 		if (token) {
-			const sameId = checkUserId(author, token)
+			const isSameId = checkUserId(author, token)
 			//verifica se o id que foi passado como autor é o msm que esta no cookie jwt 
-			if (sameId) { 
+			if (isSameId) { 
 				newPost = new post({
 					content: content,
 					author: author
@@ -51,8 +51,8 @@ routers.delete("/:postId/delete", (req, res) => {
 	const token = req.cookies.jwt
 
 	if(token){ //Verifica se existe o Cookie (se o usuario esta logado)
-		const sameId = checkUserId(author, token)
-		if(sameId){ //Verifica se o id no cookie é o mesmo que foi passado no body
+		const isSameId = checkUserId(author, token)
+		if(isSameId){ //Verifica se o id no cookie é o mesmo que foi passado no body
 			try {
 				post.findById(req.params.postId, (err, Post) => {
 					if(Post){ //Verifica se o post existe

@@ -161,5 +161,6 @@ module.exports = {
 			return res.status(401).json({ 'status': 'Você precisa estar logado' })
 		}
 
-	}
+	},
+	
 }

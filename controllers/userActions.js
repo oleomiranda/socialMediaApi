@@ -13,14 +13,20 @@ module.exports = {
 		}
 
 		if (token) {
+			
 			const isSameId = checkUserId(currentUserId, token)
+			console.log(isSameId)
 			if (isSameId) {
+				
 				//CRIAR REQUEST DO BANCO DE DADOS 
-				targetUser = await user.findById(req.body.targetId)
-				currentUser = await user.findById(req.params.currentUserId)
-
-				if (currentUser.following.includes(targetUser._id)) {
-					return res.status(400).json({ 'status': 'Você já segue este usuario' })
+				try {
+					targetUser = await user.findById(req.body.targetId)
+					currentUser = await user.findById(req.params.currentUserId)
+					if (currentUser.following.includes(targetUser._id)) {
+						return res.status(400).json({ 'status': 'Você já segue este usuario' })
+					}
+				} catch (err) {
+					return res.status(500).json({ 'status': 'Houve um erro' })
 				}
 
 				try {
@@ -32,9 +38,12 @@ module.exports = {
 					return res.status(500).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 				}
 
+			}else{
+				return res.status(401).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 			}
 		} else {
-			return res.status(401).json({ 'status': 'Você precisa estar logado' })
+			
+			res.status(401).json({ 'status': 'Você precisa estar logado' })
 		}
 
 	},
@@ -73,7 +82,7 @@ module.exports = {
 					return res.status(500).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 				}
 			} else {
-				return res.status(400).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
+				return res.status(401).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 			}
 		} else {
 			return res.status(400).json({ 'status': 'Você precisa estar logado' })
@@ -162,5 +171,5 @@ module.exports = {
 		}
 
 	},
-	
+
 }

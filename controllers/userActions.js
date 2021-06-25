@@ -16,7 +16,6 @@ module.exports = {
 		if (token) {
 
 			const isSameId = validateJwt(token, currentUserId)
-			console.log(isSameId)
 			if (isSameId) {
 
 				//CRIAR REQUEST DO BANCO DE DADOS 
@@ -122,8 +121,8 @@ module.exports = {
 	profileInfo: (req, res) => {
 		const token = req.cookies.jwt
 		const { userId } = req.params
-
-		if (token) {
+		const validToken = validateJwt(token)
+		if (validToken) {
 			try {
 				user.findById(userId, (err, User) => {
 					if (User) {

@@ -1,6 +1,6 @@
 
 const post = require("../models/posts")
-const checkUserId = require("../helper/checkUserId")
+const validateJwt = require("../helper/validateJwt")
 
 module.exports = {
 	create: (req, res) => {
@@ -23,7 +23,7 @@ module.exports = {
 		try {
 			const token = req.cookies.jwt
 			if (token) {
-				const isSameId = checkUserId(author, token)
+				const isSameId = validateJwt(token, author)
 				//verifica se o id que foi passado como autor é o msm que esta no cookie jwt 
 				if (isSameId) {
 					newPost = new post({
@@ -50,7 +50,7 @@ module.exports = {
 		const token = req.cookies.jwt
 
 		if (token) { //Verifica se existe o Cookie (se o usuario esta logado)
-			const isSameId = checkUserId(author, token)
+			const isSameId = validateJwt(token, author)
 			if (isSameId) { //Verifica se o id no cookie é o mesmo que foi passado no body
 				try {
 					post.findById(req.params.postId, (err, Post) => {

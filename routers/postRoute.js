@@ -1,6 +1,6 @@
 const routers = require("express").Router()
 const post = require("../models/posts")
-const checkUserId = require("../helper/checkUserId")
+const validateJwt = require("../helper/validateJwt")
 const postController = require("../controllers/post")
 const user = require("../models/users")
 routers.post("/create", postController.create)

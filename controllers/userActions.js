@@ -1,4 +1,4 @@
-const checkUserId = require("../helper/checkUserId")
+const validateJwt = require("../helper/validateJwt")
 const user = require("../models/users")
 
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
 
 		if (token) {
 			
-			const isSameId = checkUserId(currentUserId, token)
+			const isSameId = validateJwt(token, currentUserId)
 			console.log(isSameId)
 			if (isSameId) {
 				
@@ -59,7 +59,7 @@ module.exports = {
 
 
 		if (token) {
-			const isSameId = checkUserId(currentUserId, token)
+			const isSameId = validateJwt(token, currentUserId)
 			if (isSameId) {
 				try {
 					targetUser = await user.findById(req.body.targetId)
@@ -96,7 +96,7 @@ module.exports = {
 		const token = req.cookies.jwt
 
 		if (token) {
-			isSameId = checkUserId(currentUserId, token)
+			isSameId = validateJwt(token, currentUserId)
 			if (isSameId) {
 				try {
 					user.findById(currentUserId, (err, User) => {
@@ -150,7 +150,7 @@ module.exports = {
 		const { currentUserId } = req.params
 
 		if (token) {
-			isSameId = checkUserId(currentUserId, token)
+			isSameId = validateJwt(token, currentUserId)
 			if (isSameId) {
 				try {
 					user.findById(req.params.currentUserId, (err, User) => {

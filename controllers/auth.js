@@ -1,7 +1,7 @@
 const user = require("../models/users")
 const bcrypt = require("bcryptjs")
 const createJwt = require("../helper/createJwt")
-const checkUserId = require("../helper/checkUserId")
+
 
 module.exports = {
 

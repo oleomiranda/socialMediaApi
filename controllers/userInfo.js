@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs")
 const user = require("../models/users")
-const checkUserId = require("../helper/checkUserId")
+const validateJwt = require("../helper/validateJwt")
 
 
 module.exports = {
@@ -10,7 +10,7 @@ module.exports = {
 		const token = req.cookies.jwt
 
 		if (token) {
-			isSameId = checkUserId(currentUserId, token)
+			isSameId = validateJwt(token, currentUserId)
 
 			if (isSameId) {
 				if (newPassword !== confNewPassword) { return res.status(400).json({ 'status': 'A nova senha e a confirmação não são iguais' }) }

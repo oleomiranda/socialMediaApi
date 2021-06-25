@@ -1,5 +1,6 @@
 const validateJwt = require("../helper/validateJwt")
 const user = require("../models/users")
+const post = require("../models/posts")
 
 module.exports = {
 
@@ -13,11 +14,11 @@ module.exports = {
 		}
 
 		if (token) {
-			
+
 			const isSameId = validateJwt(token, currentUserId)
 			console.log(isSameId)
 			if (isSameId) {
-				
+
 				//CRIAR REQUEST DO BANCO DE DADOS 
 				try {
 					targetUser = await user.findById(req.body.targetId)
@@ -38,11 +39,11 @@ module.exports = {
 					return res.status(500).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 				}
 
-			}else{
+			} else {
 				return res.status(401).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 			}
 		} else {
-			
+
 			res.status(401).json({ 'status': 'Você precisa estar logado' })
 		}
 
@@ -171,5 +172,39 @@ module.exports = {
 		}
 
 	},
+
+	timeline: (req, res) => {
+		const token = req.cookies.jwt
+		const { userId } = req.params
+		validToken = validateJwt(token)
+
+		if (validToken) {
+			var fields = { __v: false, _id: false, author: false, likes: false }
+			post.find({ author: req.params.userId }, fields).then((Posts) => {
+				const { } = Posts
+				return res.json({ 'posts': Posts })
+			}).catch((err) => {
+				return res.status(500).json({ 'status': 'Houve um erro' })
+			})
+		} else {
+			return res.status(401).json({ 'status': 'Você precisa estar logado ' })
+		}
+	},
+	searchUser: (req, res) => {
+		const { username } = req.params
+		const token = req.cookies.jwt
+		const validToken = validateJwt(token)
+
+		if (validToken) {
+			var fields = { __v: false, _id: false, author: false, likes: false, followers: false, following: false, isAdmin: false, likedPosts: false, email: false, password: false, coverPicture: false, profilePicture: false }
+			user.find({ username: { $regex: username, $options: 'i' } }, fields).then((Users) => {
+				return res.status(200).json({ 'users': Users })
+			}).catch((err) => {
+				return res.status(400).json({ 'status': 'Houve um erro ao tentar executar esta ação' })
+			})
+		} else {
+			return res.status(401).json({ 'statu': 'Você precisa estar logado' })
+		}
+	}
 
 }

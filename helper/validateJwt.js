@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken")
 
-module.exports = function validate(jwtToken, userid=none) {
+module.exports = function validate(jwtToken, userid=null) {
 	answer = ''
 	jwt.verify(jwtToken, process.env.JWT_SECRET, (err, decoded) => {
-		if(userid !== none){
+		if(userid !== null){
 			if(decoded && decoded.id == userid){
 				answer = true
 			}else{

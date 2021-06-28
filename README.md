@@ -35,7 +35,7 @@ username é como o @ do twitter  <br>
 <hr>
 
 ## Mudar senha [ /api/user/password/edit/*seu-Id* ] -- *method PUT*
-passar no body * *oldpassword* *, * *newPassword* * e * *confNewPassword* * <br>
+passar no body * *oldPassword* *, * *newPassword* * e * *confNewPassword* * <br>
 <hr>
 
 ## Mudar email [ /api/user/email/edit/*seu-id* ] -- *method PUT*

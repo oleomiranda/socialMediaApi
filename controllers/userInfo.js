@@ -8,8 +8,8 @@ module.exports = {
 		const { currentUserId } = req.params
 		const { oldPassword, newPassword, confNewPassword } = req.body
 		const token = req.cookies.jwt
-		validToken = validateJwt(token)
-		if (validToken) {
+		
+		if (token) {
 			isSameId = validateJwt(token, currentUserId)
 
 			if (isSameId) {
@@ -48,9 +48,9 @@ module.exports = {
 		const { currentUserId } = req.params
 		const { password, newEmail, confNewEmail } = req.body
 
-		validToken = validateJwt(token)
+		
 
-		if (validToken) {
+		if (token) {
 			isSameId = validateJwt(token, currentUserId)
 
 			if (isSameId) {

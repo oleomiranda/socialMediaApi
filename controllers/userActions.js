@@ -1,7 +1,7 @@
 const validateJwt = require("../helper/validateJwt")
 const user = require("../models/users")
 const post = require("../models/posts")
-
+const bcrypt = require("bcryptjs")
 module.exports = {
 
 	followUser: async (req, res) => {
@@ -148,15 +148,22 @@ module.exports = {
 	deleteProfile: (req, res) => {
 		const token = req.cookies.jwt
 		const { currentUserId } = req.params
+		const {password} = req.body
 		if (token) {
 			isSameId = validateJwt(token, currentUserId)
 			if (isSameId) {
 				try {
 					user.findById(req.params.currentUserId, (err, User) => {
+						bcrypt.compare(password, User.password, (err, success) => {
+							if(success){
+								User.remove()
+								res.cookie('jwt', '', { maxAge: 10 })
+								res.status(200).json({ 'status': 'Sua conta foi deletada' })
+							}else{
+								return res.status(401).json({'status': 'Senha incorreta'})
+							}
+						})
 
-						User.remove()
-						res.cookie('jwt', '', { maxAge: 10 })
-						res.status(200).json({ 'status': 'Sua conta foi deletada' })
 					})
 				} catch (err) {
 					return res.status(500).json({ 'status': 'Houve um erro ao tentar completar esta ação' })

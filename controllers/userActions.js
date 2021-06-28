@@ -105,7 +105,7 @@ module.exports = {
 
 						User.save()
 
-						return res.status(200).json({ 'status': User })
+						return res.status(200).json({ 'status':'Seu perfil foi editado com sucesso'})
 					})
 				} catch (err) {
 					return res.status(500).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
@@ -132,7 +132,7 @@ module.exports = {
 						return res.json({ 'user': { username, name, 'followers': followersCount, 'following': followingCount } })
 
 					} else {
-						return res.status(404).json({ 'status': 'Usuario não encontrado' })
+						return res.status(404).json({ 'status': 'Houve um erro ao tentar completar esta ação' })
 					}
 
 				})
@@ -148,7 +148,6 @@ module.exports = {
 	deleteProfile: (req, res) => {
 		const token = req.cookies.jwt
 		const { currentUserId } = req.params
-
 		if (token) {
 			isSameId = validateJwt(token, currentUserId)
 			if (isSameId) {

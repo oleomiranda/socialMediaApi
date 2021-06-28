@@ -5,6 +5,7 @@ const userInfoController = require("../controllers/userInfo")
 const validateJwt = require("../helper/validateJwt")
 const user = require("../models/users")
 const post = require("../models/posts")
+const bcrypt = require("bcryptjs")
 routers.post("/signup", authController.signup)
 
 routers.post("/login", authController.login)
@@ -16,6 +17,8 @@ routers.post("/:currentUserId/unfollow", userActionsController.unfollowUser)
 routers.put("/profile/edit/:currentUserId", userActionsController.editProfile)
 
 routers.put("/password/edit/:currentUserId", userInfoController.changePassword)
+
+routers.put("/email/edit/:currentUserId", userInfoController.changeEmail)
 
 routers.get("/:userId", userActionsController.profileInfo)
 
